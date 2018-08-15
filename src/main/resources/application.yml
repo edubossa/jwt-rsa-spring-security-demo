@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: jwt-rsa-spring-security
+  h2:
+    console:
+      enabled: true
+
+
+rsa:
+  file: /Users/ews/Apps/private.pem
+  key: 660992
+
+
+jwt:
+  expiration:
+    time:
+      minutes: 10
+
