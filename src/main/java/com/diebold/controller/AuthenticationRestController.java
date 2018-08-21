@@ -8,6 +8,7 @@ import com.nimbusds.jose.JOSEException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -15,9 +16,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.GeneralSecurityException;
 import java.util.Objects;
@@ -64,6 +63,18 @@ public class AuthenticationRestController {
         } catch (BadCredentialsException e) {
             throw new AuthenticationException("Bad credentials!", e);
         }
+    }
+
+    @GetMapping(path = "/encrypt/{value}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> encrypt(@PathVariable String value) {
+        String valueEncrypt = null;
+        try {
+            valueEncrypt = jwtToken.encrypt(value);
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+            valueEncrypt = e.getMessage();
+        }
+        return ResponseEntity.ok("{\"value\" : \"" + valueEncrypt + "\"}");
     }
 
 }

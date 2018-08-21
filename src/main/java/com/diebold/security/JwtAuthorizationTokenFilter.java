@@ -3,11 +3,6 @@ package com.diebold.security;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -23,51 +18,17 @@ public class JwtAuthorizationTokenFilter extends OncePerRequestFilter {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    private UserDetailsService userDetailsService;
-
-    @Autowired
     private JwtTokenUtil jwtTokenUtil;
-
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         log.debug("processing authentication for '{}'", request.getRequestURL());
         final String requestHeader = request.getHeader("Authorization");
-        String username = null;
-        String authToken = null;
         if (requestHeader != null && requestHeader.startsWith("Bearer ")) {
-            authToken = requestHeader.substring(7);
-
-//            try {
-//                username = jwtTokenUtil.getUsernameFromToken(authToken);
-//            } catch (IllegalArgumentException e) {
-//                log.error("an error occured during getting username from token", e);
-//            } catch (ExpiredJwtException e) {
-//                log.warn("the token is expired and not valid anymore", e);
-//            }
-
-        } else {
-            log.warn("couldn't find bearer string, will ignore the header");
+            String authToken = requestHeader.substring(7);
+            jwtTokenUtil.validateToken(authToken, request);
         }
-
-        log.debug("checking authentication for user '{}'", username);
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-            // TODO Verificar se e necessario buscar as informacoes do banco, pois aqui podemos obter do proprio token
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-
-
-            //TODO validar o token
-//            if (jwtTokenUtil.validateToken(authToken, userDetails)) {
-//                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-//                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-//                log.info("authorizated user '{}', setting security context", username);
-//                SecurityContextHolder.getContext().setAuthentication(authentication);
-//            }
-        }
-
         chain.doFilter(request, response);
-
     }
 
 }

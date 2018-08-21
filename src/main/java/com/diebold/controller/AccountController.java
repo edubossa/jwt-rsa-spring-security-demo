@@ -1,11 +1,12 @@
 package com.diebold.controller;
 
 import com.diebold.model.Account;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
@@ -14,6 +15,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/accounts")
 public class AccountController {
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private List<Account> accounts;
 
@@ -27,10 +30,18 @@ public class AccountController {
         this.accounts.add(new Account("6764", "235656-1"));
     }
 
-
     @GetMapping
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<Account>> getAccounts() {
         return new ResponseEntity<>(this.accounts, HttpStatus.OK);
+    }
+
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Account> postAccounts(@RequestBody Account account) {
+        log.info(account.toString());
+        this.accounts.add(account);
+        return new ResponseEntity<Account>(account, HttpStatus.OK);
     }
 
 }

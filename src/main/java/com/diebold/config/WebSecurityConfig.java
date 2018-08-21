@@ -1,6 +1,7 @@
 package com.diebold.config;
 
 import com.diebold.security.JwtAuthenticationEntryPoint;
+import com.diebold.security.JwtAuthorizationTokenFilter;
 import com.diebold.security.service.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,7 @@ import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +34,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private JwtUserDetailsService jwtUserDetailsService;
+
+    @Autowired
+    private JwtAuthorizationTokenFilter authenticationTokenFilter;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -64,11 +69,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 .antMatchers("/auth/**").permitAll()
+                .antMatchers("/encrypt/**").permitAll()
                 .antMatchers("/h2-console/**/**").permitAll()
                 .anyRequest().authenticated();
 
-        //httpSecurity
-                //.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        httpSecurity
+                .addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         // disable page caching
         httpSecurity
