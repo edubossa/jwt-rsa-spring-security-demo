@@ -21,8 +21,9 @@ import org.springframework.web.bind.annotation.*;
 import java.security.GeneralSecurityException;
 import java.util.Objects;
 
-@RestController
 
+@RestController
+@CrossOrigin
 public class AuthenticationRestController {
 
     @Autowired
