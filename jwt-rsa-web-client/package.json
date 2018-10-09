@@ -1,0 +1,15 @@
+{
+  "name": "password-encryption",
+  "version": "1.0.0",
+  "description": "Banestes Password Encryption",
+  "main": "encrypt.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Eduardo Wallace",
+  "license": "ISC",
+  "dependencies": {
+    "js-sha256": "^0.9.0",
+    "jsencrypt": "^3.0.0-rc.1"
+  }
+}
